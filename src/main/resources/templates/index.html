@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Multiplication</title>
+</head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<body>
+<div style="margin: 10px">
+    <button onclick="multiplyClient()">Multiply Client</button>
+    <button onclick="multiplyServer()">Multiply Server</button>
+</div>
+<div style="margin: 10px">
+    <label style="margin-right: 5px">Threads:
+        <input type="text" id="threadsSize"/>
+    </label>
+    <label>Size:
+        <input type="text" id="size"/>
+    </label>
+</div>
+<p id="time" style="font-weight: bold; margin: 0 10px">Time:</p>
+</body>
+<script>
+    function multiplyClient() {
+        let size = document.getElementById('size').value;
+        let threadSize = document.getElementById('threadsSize').value;
+
+        let matrixA = [];
+        let matrixB = [];
+
+        for (let i = 0; i < size; i++) {
+            matrixA[i] = [];
+            matrixB[i] = [];
+            for (let l = 0; l < size; l++) {
+                // matrixA[i][l] = Math.trunc(Math.random() * 10);
+                // matrixB[i][l] = Math.trunc(Math.random() * 10);
+                matrixA[i][l] = 1;
+                matrixB[i][l] = 1;
+            }
+        }
+
+        let data = {
+            matrixA: matrixA,
+            matrixB: matrixB,
+            threadsSize: threadSize
+        };
+
+        let start = new Date();
+
+        $.ajax({
+            url: '/multiplyClient',
+            type: 'POST',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(data),
+            success: data => {
+                let end = new Date();
+                document.getElementById("time").innerText = "Time: " + (end.getTime() - start.getTime());
+            },
+            error: er => {
+                let end = new Date();
+                document.getElementById("time").innerText = "Time: " + (end.getTime() - start.getTime());
+            }
+        });
+    }
+
+    function multiplyServer() {
+        let size = document.getElementById('size').value;
+        let threadSize = document.getElementById('threadsSize').value;
+
+        let data = {
+            matrixSize: size,
+            threadsSize: threadSize
+        };
+
+        let start = new Date();
+
+        $.ajax({
+            url: '/multiplyServer',
+            type: 'POST',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(data),
+            success: data => {
+                console.log("success server")
+                let end = new Date();
+                document.getElementById("time").innerText = "Time: " + (end.getTime() - start.getTime());
+            },
+            error: er => {
+                console.log("error server")
+                let end = new Date();
+                document.getElementById("time").innerText = "Time: " + (end.getTime() - start.getTime());
+            }
+        });
+    }
+</script>
+</html>
